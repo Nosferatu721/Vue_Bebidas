@@ -2,14 +2,24 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useBebidasStore } from '@/stores/bebidas'
+import { useNotificacionStore } from '@/stores/notificacion'
 
 const route = useRoute()
-const store = useBebidasStore()
+const storeBebidas = useBebidasStore()
+const storeNotificacion = useNotificacionStore()
 
 const inInicio = computed(() => route.name === 'inicio')
 
 const handleSubmit = () => {
-  store.obtenerRecetas()
+  // Validar formulario
+  if (!storeBebidas.busqueda.nombre.trim() && !storeBebidas.busqueda.categoria) {
+    storeNotificacion.texto = 'Por favor, ingrese un nombre o seleccione una categoría.'
+    storeNotificacion.error = true
+    storeNotificacion.show = true
+    storeNotificacion.mostrar()
+    return
+  }
+  storeBebidas.obtenerRecetas()
 }
 </script>
 
@@ -23,11 +33,9 @@ const handleSubmit = () => {
           </RouterLink>
         </div>
 
-        <nav class="flex gap-4">
-          <RouterLink :to="{ name: 'inicio' }" class="text-white font-bold uppercase text-lg hover:text-amber-500 transition"> Inicio </RouterLink>
-          <RouterLink :to="{ name: 'favoritos' }" class="text-white font-bold uppercase text-lg hover:text-amber-500 transition">
-            Favoritos
-          </RouterLink>
+        <nav class="flex gap-4 text-white">
+          <RouterLink :to="{ name: 'inicio' }" class="font-bold uppercase text-lg hover:text-amber-500 transition"> Inicio </RouterLink>
+          <RouterLink :to="{ name: 'favoritos' }" class="font-bold uppercase text-lg hover:text-amber-500 transition"> Favoritos </RouterLink>
         </nav>
       </div>
 
@@ -39,7 +47,7 @@ const handleSubmit = () => {
             type="text"
             class="p-3 w-full rounded-lg focus:outline-none bg-amber-50 text-gray-800"
             placeholder="Buscar bebida por nombre o ingrediente"
-            v-model="store.busqueda.nombre"
+            v-model="storeBebidas.busqueda.nombre"
           />
         </div>
         <div class="space-y-4">
@@ -48,10 +56,10 @@ const handleSubmit = () => {
             name="categoria"
             id="categoria"
             class="p-3 w-full rounded-lg focus:outline-none bg-amber-50 text-gray-800"
-            v-model="store.busqueda.categoria"
+            v-model="storeBebidas.busqueda.categoria"
           >
             <option value="">-- Seleccione --</option>
-            <option v-for="categoria in store.categorias" :key="categoria.strCategory" :value="categoria.strCategory">
+            <option v-for="categoria in storeBebidas.categorias" :key="categoria.strCategory" :value="categoria.strCategory">
               {{ categoria.strCategory }}
             </option>
           </select>

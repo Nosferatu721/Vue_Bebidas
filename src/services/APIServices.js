@@ -16,8 +16,17 @@ const buscarRecetas = async ({ categoria, nombre }) => {
     console.error('Error al buscar recetas:', error)
   }
 }
+const buscarReceta = async (id) => {
+  try {
+    const { data } = await api.get(`/lookup.php?i=${id}`)
+    return data
+  } catch (error) {
+    console.error('Error al buscar receta por ID:', error)
+  }
+}
 
 export default {
   obtenerCategorias,
   buscarRecetas,
+  buscarReceta
 }
